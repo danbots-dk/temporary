@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% block extra_head %}
+{% endblock %}
+{% load i18n static %}
+{% block title %}{% trans "Inference Model" %}{% endblock %}
+{% block content %}
+    <div class="card-deck">
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header">
+                <h5 class="my-0 font-weight-bold">Please update the model info for the inference server</h5>
+            </div>
+            <div class="card-body">
+                {% if form.errors %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ form.errors }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endif %}
+                
+                {% if messages %}
+                    {% for message in messages %}
+                        {% if  message.tags == "error" %}
+                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                {{ message|safe }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message|safe }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+
+                <form method="post" enctype="multipart/form-data" id="upload-inference-model">
+                    {% csrf_token %}
+
+
+                
+                    <div class="form-group row">
+                        <label for="{{ form.net.id_for_label }}" class="col-sm-3 col-form-label font-weight-bold">{{ form.net.label }}</label>
+                        <div class="col-sm-9">
+                            {{ form.net }}
+                            {% if form.net.errors %}
+                                <span class="text-danger">{{ form.net.errors }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="{{ form.model.id_for_label }}" class="col-sm-3 col-form-label font-weight-bold">
+                            {{ form.model.label }}
+                        </label>
+                        <div class="col-sm-9">
+                            {{ form.model }}
+                            {% if form.model.errors %}
+                                <span class="text-danger">{{ form.model.errors }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <!--
+                    <div class="form-group row">
+                        <label for="{{ form.is_currently_used.id_for_label }}" class="col-sm-3 col-form-label font-weight-bold">
+                            {{ form.is_currently_used.label }}
+                        </label>
+                        <div class="col-sm-9">
+                            {{ form.is_currently_used }}
+                            {% if form.is_currently_used.errors %}
+                                <span class="text-danger">{{ form.is_currently_used.errors }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    -->
+                    <div style="text-align: right;">
+                        <button type="submit" class="btn btn-primary">Upload</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block extra_js %}
+<script>
+    $(document).ready(function() {
+        $('#id_net').change(function() {
+            var netId = $(this).val();
+            $.ajax({
+                url: '/get-models-for-network/' + netId + '/',
+                method: 'GET',
+                success: function(data) {
+                    $('#id_model').empty().append('<option value="">Please select a model</option>');
+                    data.forEach(function(model) {
+                        $('#id_model').append(new Option(model[0]+ ' - ' +model[1], model[0]));
+                    });
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

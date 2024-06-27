@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+{% block title %}{% trans "Segmentation Stitching Simulation Model" %}{% endblock %}
+{% block extra_head %}
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+{% endblock %}
+{% block content %}
+<div class="card-deck">
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header">
+            <h5 class="my-0 font-weight-bold">Please fill up information about upload segmentation stitching simulation model</h5>
+        </div>
+        <div class="card-body">
+            <!-- Error messages and form start -->
+            {% if form.errors %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ form.errors }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            {% endif %}
+            
+            {% if messages %}
+                {% for message in messages %}
+                    {% if  message.tags == "error" %}
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            {{ message|safe }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message|safe }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+            <form method="post" enctype="multipart/form-data" id="upload-segmented-stitching-simulation-model">
+                {% csrf_token %}
+                <div class="form-group row">
+                    <label for="{{ form.uploaded_model.id_for_label }}" class="col-sm-3 col-form-label font-weight-bold">
+                        {{ form.uploaded_model.label }}
+                    </label>
+                    <div class="col-sm-8">
+                        {{ form.uploaded_model }}
+                        {% if form.uploaded_model.errors %}
+                            <span class="text-danger">{{ form.uploaded_model.errors }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            
+                <div class="form-group row">
+                    <label for="{{ form.stitched_file.id_for_label }}" class="col-sm-3 col-form-label font-weight-bold">
+                        {{ form.stitched_file.label }}
+                    </label>
+                    <div class="col-sm-8">
+                        {{ form.stitched_file }}
+                        {% if form.stitched_file.errors %}
+                            <span class="text-danger">{{ form.stitched_file.errors }}</span>
+                        {% endif %}
+                        <input type="hidden" id="id_stitched_file_required" name="stitched_file_required" value="true" required>
+                    </div>
+                </div>
+                
+                <div class="form-group row">
+                    <label for="{{ form.batch_name.id_for_label }}" class="col-sm-3 col-form-label font-weight-bold">{{ form.batch_name.label }}</label>
+                    <div class="col-sm-8">
+                        {{ form.batch_name }}
+                        {% if form.batch_name.errors %}
+                            <span class="text-danger">{{ form.batch_name.errors }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            
+                <div class="form-group row">
+                    <label for="{{ form.nb_points.id_for_label }}" class="col-sm-3 col-form-label font-weight-bold">{{ form.nb_points.label }}</label>
+                    <div class="col-sm-8">
+                        {{ form.nb_points }}
+                        {% if form.nb_points.errors %}
+                            <span class="text-danger">{{ form.nb_points.errors }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="{{ form.radius.id_for_label }}" class="col-sm-3 col-form-label font-weight-bold">{{ form.radius.label }}</label>
+                    <div class="col-sm-8">
+                        {{ form.radius }}
+                        {% if form.radius.errors %}
+                            <span class="text-danger">{{ form.radius.errors }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="{{ form.voxel_size.id_for_label }}" class="col-sm-3 col-form-label font-weight-bold">{{ form.voxel_size.label }}</label>
+                    <div class="col-sm-8">
+                        {{ form.voxel_size }}
+                        {% if form.voxel_size.errors %}
+                            <span class="text-danger">{{ form.voxel_size.errors }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div style="text-align: right;">
+                    <button type="submit" class="btn btn-primary">Execute</button>
+                </div>
+            </form> 
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script src="https://rawgit.com/select2/select2-sortable/master/select2.sortable.js"></script>
+<script>
+$(document).ready(function () {
+    var selectedStitchedFiles = [];
+
+    $('#id_stitched_file').select2({
+        width: '100%',
+        placeholder: 'Select a stitched file',
+        allowClear: true,
+        tags: true, // Allow user to add custom values
+        sorter: function(data) {
+            return data; // Disable default sorting
+        }
+    }).on('select2:select', function (e) {
+        var selectedElement = e.params.data;
+        selectedStitchedFiles.push(selectedElement.id);
+        updateSelectOrder();
+        addHiddenField(selectedElement.id, selectedElement.text);
+    }).on('select2:unselect', function (e) {
+        var unselectedElement = e.params.data;
+        var index = selectedStitchedFiles.indexOf(unselectedElement.id);
+        if (index > -1) {
+            selectedStitchedFiles.splice(index, 1);
+        }
+        updateSelectOrder();
+        removeHiddenField(unselectedElement.id);
+    });
+
+    function updateSelectOrder() {
+        var $stitched_file = $('#id_stitched_file');
+        var options = $stitched_file.find('option');
+        options.sort(function(a, b) {
+            var aIndex = selectedStitchedFiles.indexOf($(a).val());
+            var bIndex = selectedStitchedFiles.indexOf($(b).val());
+            return aIndex - bIndex;
+        });
+        $stitched_file.html(options);
+        $stitched_file.val(selectedStitchedFiles).trigger('change');
+    }
+
+    function addHiddenField(id, name) {
+        var hiddenInput = $('<input>')
+            .attr('type', 'hidden')
+            .attr('name', 'stitched_file_name_' + id)
+            .attr('id', 'stitched_file_name_' + id)
+            .val(name);
+        $('#upload-segmented-stitching-simulation-model').append(hiddenInput);
+    }
+
+    function removeHiddenField(id) {
+        $('#stitched_file_name_' + id).remove();
+    }
+
+    $('#id_uploaded_model').change(function () {
+        var uploadedModelId = $(this).val();
+        var $stitched_file = $('#id_stitched_file');
+        if (uploadedModelId) {
+            $.ajax({
+                url: '/get-stitched-files/' + uploadedModelId + '/',
+                type: 'GET',
+                success: function(data) {
+                    $stitched_file.empty();
+                    if (data.stitched_file_choices && data.stitched_file_choices.length > 0) {
+                        $.each(data.stitched_file_choices, function(index, value) {
+                            var option = $('<option></option>').attr('value', value.output_folder).text(value.name || 'No Name');
+                            option.data('name', value.name);  // Store additional data in data-* attributes
+                            $stitched_file.append(option);
+                        });
+                    } else {
+                        $stitched_file.append($('<option></option>').attr('value', '').text('No stitched files available'));
+                    }
+                    $stitched_file.trigger('change'); // Refresh Select2
+                },
+                error: function(xhr, status, error) {
+                    console.log('Error fetching stitched files:', error);
+                    $stitched_file.append($('<option></option>').attr('value', '').text('Error fetching stitched files'));
+                    $stitched_file.trigger('change'); // Refresh Select2
+                }
+            });
+        } else {
+            $stitched_file.empty();
+            $stitched_file.append($('<option></option>').attr('value', '').text('Select a stitched file'));
+            $stitched_file.trigger('change'); // Refresh Select2
+        }
+    });
+});
+</script>
+{% endblock %}

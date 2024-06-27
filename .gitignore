@@ -1,0 +1,12 @@
+*.pyc
+*.log
+*.log*
+*.png
+*.npy
+*.sqlite3
+*.pid
+infer/segment_stitching_logs.txt
+infer/segment_elements.json
+infer/segment_elements.json
+infer/segment_elements
+

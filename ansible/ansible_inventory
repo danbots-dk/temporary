@@ -1,0 +1,6 @@
+[your_target_servers]
+#sal5 ansible_ssh_host=sal5.local ansible_connection=ssh
+#sal6 ansible_ssh_host=sal6.local ansible_connection=ssh
+#sal7 ansible_ssh_host=sal7.local ansible_connection=ssh
+#sal8 ansible_ssh_host=sal8.local ansible_connection=ssh
+sal9 ansible_ssh_host=sal9.local ansible_connection=ssh

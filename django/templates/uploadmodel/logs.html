@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% block extra_head %}
+{% endblock %}
+{% load i18n static %}
+{% block title %}{% trans "All system logs" %}{% endblock %}
+{% block content %}
+    <div class="card-deck">
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header">
+                <h5 class="my-0 font-weight-bold">
+                    All System Logs
+                    <button class="btn btn-sm btn-danger clear-all-logs" style="float: right"
+                            data-url="{% url 'clear-all-logs-ajax' %}">
+                            Clear All Logs
+                    </button>
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if form.errors %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ form.errors }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endif %}
+                {% if messages %}
+                    {% for message in messages %}
+                        {% if  message.tags == "error" %}
+                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                {{ message|safe }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message|safe }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                <table class="table">
+                    <thead>
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Log name</th>
+                        <th scope="col">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th scope="row">1</th>
+                        <td>Upload models log</td>
+                        <td>
+                            <a href="{% url 'log-detail' %}?type=upload_model" class="btn btn-primary">
+                                See
+                            </a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <th scope="row">2</th>
+                        <td>Application log</td>
+                        <td>
+                            <a href="{% url 'log-detail' %}?type=django" class="btn btn-primary">
+                                See
+                            </a>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block extra_js %}
+<script>
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    $(document).ready(function () {
+
+        var csrftoken = getCookie('csrftoken');
+
+        function csrfSafeMethod(method) {
+            // these HTTP methods do not require CSRF protection
+            return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+        }
+
+        $.ajaxSetup({
+            crossDomain: false, // obviates need for sameOrigin test
+            beforeSend: function (xhr, settings) {
+                if (!csrfSafeMethod(settings.type)) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+        toastr.options = {
+            closeButton: true,
+            debug: false,
+            newestOnTop: true,
+            progressBar: false,
+            positionClass: 'toast-top-right',
+            preventDuplicates: false,
+            showDuration: '300',
+            hideDuration: '1000',
+            timeOut: '1000',
+            extendedTimeOut: '1000',
+            showEasing: 'swing',
+            hideEasing: 'linear',
+            showMethod: 'fadeIn',
+            hideMethod: 'fadeOut'
+        };
+        toastr.options.onclick = function () {
+            location.reload();
+        }
+        toastr.options.onCloseClick = function () {
+            location.reload();
+        }
+        toastr.options.onHidden = function () {
+            location.reload();
+        }
+        $('.clear-all-logs').click(function () {
+            let url = $(this).data("url")
+            $.get(url, function (data) {
+                if (data.result === "success") {
+                    toastr.success(data.message, "Success")
+                } else {
+                    toastr.error(data.message, "Error")
+                }
+            }).fail(function (error) {
+                console.log(error)
+                toastr.error("Server error. Please try again later.", "Error")
+            });
+        });
+       
+    });
+</script>
+{% endblock %}

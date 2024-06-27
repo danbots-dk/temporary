@@ -1,0 +1,88 @@
+FROM tensorflow/tensorflow:2.12.0-gpu
+#FROM tensorflow/tensorflow:latest-gpu
+RUN apt-get update -y
+#RUN apt upgrade -y
+
+RUN /usr/bin/python3 -m pip install --upgrade pip
+RUN apt install ffmpeg libsm6 libxext6  -y
+RUN pip3 install bootstrap-py
+RUN pip3 install opencv-python
+RUN pip3 install matplotlib
+RUN pip3 install pandas
+RUN pip3 install seaborn
+RUN pip3 install tqdm
+RUN pip3 install plotly
+RUN pip3 install imageio
+RUN pip3 install scikit-image
+RUN pip3 install tensorflow-addons
+RUN pip3 install focal-loss
+RUN pip3 install tensorflow-datasets
+RUN pip3 install keras-applications
+RUN pip3 install keras-preprocessing
+RUN pip3 install keras-segmentation
+RUN pip3 install keras-tuner
+RUN pip3 install open3d
+RUN pip3 install scikit-learn
+RUN pip3 install Pillow
+RUN pip3 install moonrakerpy
+#RUN pip3 install pytables
+RUN pip3 install tables
+RUN pip3 install protobuf==3.20.*
+RUN pip3 install plyfile
+RUN pip3 install Django==4.2.4
+RUN pip3 install django4-background-tasks==1.2.8
+RUN pip3 install django-select2==8.1.2
+
+RUN apt update -y
+
+RUN apt-get install python3-sklearn -y
+RUN apt install python3-tk -y
+RUN apt update
+RUN apt install git -y
+RUN apt-get install supervisor -y
+RUN apt-get install avahi-utils -y
+
+ARG USERNAME=samir
+ARG USER_UID=1000
+ARG USER_GID=$USER_UID
+
+ENV USER=samir
+
+# Create the user
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+    #
+    # [Optional] Add sudo support. Omit if you don't need to install software after connecting.
+    && apt-get update \
+    && apt-get install -y sudo \
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME
+
+# ********************************************************
+# * Anything else you want to do like clean up goes here *
+# ********************************************************
+
+# [Optional] Set the default user. Omit if you want to keep the default as root.
+#USER $USERNAMEUSER_UID:$USER_GID /home/$USERNAME
+USER $USERNAME
+RUN mkdir -p /home/samir/sal_github/docker/inference-dev-server/django
+WORKDIR /home/samir/sal_github/docker/inference-dev-server/django
+
+
+#COPY ./inference-app.sh /home/samir/inference-app.sh 
+#RUN sh /home/samir/inference-app.sh
+
+COPY ./supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+RUN sudo chown $USERNAME:$USERNAME /etc/supervisor/conf.d/supervisord.conf
+
+# RUN chmod a+x ./django/inference-app.sh
+# ENTRYPOINT ["./django/inference-app.sh"]
+COPY ./resolv.conf /etc/reslov.conf
+#CMD ["/usr/bin/python", "manage.py", "runserver", "0.0.0.0"] 
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+
+# ---- inspiration from inference server with flask setup ----
+# sudo /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf -n -l /home/samir/sal_github/docker/inference-dev-server/django/supervisord.log
+### Copy project files into container ###
+# COPY ./serverFiles/flask/ /var/www/flask/
+# COPY ./serverFiles/flask.conf /etc/apache2/sites-available/flask.conf

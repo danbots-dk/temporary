@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block extra_head %}
+{% endblock %}
+{% load i18n static %}
+{% block title %}{% trans "Upload Simulation Model" %}{% endblock %}
+{% block content %}
+    <div class="card-deck text-center">
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header">
+                <h5 class="my-0 font-weight-normal">Simulation Model</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-title pricing-card-title">You can upload simulation model from here.</p>
+                <a href="{% url 'simulation_mode_upload' %}" class="btn btn-lg btn-block btn-primary">
+                    Go
+                </a>
+            </div>
+        </div>
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header">
+                <h5 class="my-0 font-weight-normal">Wand Model</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-title pricing-card-title">You can upload wand model from here.</p>
+                <a href="{% url 'wand_mode_upload' %}" class="btn btn-lg btn-block btn-primary">
+                   Go
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="card-deck text-center">
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header">
+                <h5 class="my-0 font-weight-normal">Stitching Simulation Model</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-title pricing-card-title">You can upload stitching simulation model from here.</p>
+                <a href="{% url 'stitching_simulation_mode_upload' %}" class="btn btn-lg btn-block btn-primary">
+                    Go
+                </a>
+            </div>
+        </div>
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header">
+                <h5 class="my-0 font-weight-normal">Inference Model</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-title pricing-card-title">Upload trained models to an inference server here.</p>
+                <a href="{% url 'inference-models' %}" class="btn btn-lg btn-block btn-primary">
+                    Go
+                </a>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="card-deck text-center">
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header">
+                <h5 class="my-0 font-weight-normal">Segmentation Stitching Simulation Model</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-title pricing-card-title">You can upload segmentation stitching simulation model from here.</p>
+                <a href="{% url 'simulation_segment_stitching_model_upload' %}" class="btn btn-lg btn-block btn-primary">
+                    Go
+                </a>
+            </div>
+        </div>
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header">
+                <h5 class="my-0 font-weight-normal">Wand Model Upload 3D Printer</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-title pricing-card-title">You can upload wand model used 3D printer from here.</p>
+                <a href="{% url 'wand_xyz_displacement_mode_upload' %}" class="btn btn-lg btn-block btn-primary">
+                    Go
+                </a>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block extra_js %}
+    <script>
+
+    </script>
+{% endblock %}

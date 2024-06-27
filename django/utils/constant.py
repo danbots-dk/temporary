@@ -1,0 +1,7 @@
+NETWORK_API = 'apis/v1/networks/'
+NETWORK_MODEL_API = 'apis/v1/network/model/'
+INFERENCE_MODEL_API = 'apis/v1/inference-models/'
+NETWORK_MODEL_BY_NETWORK_API = 'apis/v1/network/model/model_by_network/'
+DEPTH_MODEL = 'api/v1/depth_model'
+WRAP_MODEL ='api/v1/wrap_model'
+LUM_MODEL = 'api/v1/lum_model'

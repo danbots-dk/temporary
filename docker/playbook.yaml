@@ -1,0 +1,14 @@
+---
+- name: Change Working Directory and Run Commands
+  hosts: servers
+  tasks:
+    - name: Change Working Directory
+      become: no  # If you need to change to a directory that requires elevated privileges
+      command: cd /home/samir/sal_github/docker/inference-dev-server
+      args:
+        warn: no  # Suppress warnings about the change in working directory
+
+    - name: Execute Commands in the New Working Directory
+      command: |
+        command1
+        command2

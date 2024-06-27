@@ -1,0 +1,48 @@
+---
+- name: Pull GitHub Repo and Run Bash Commands
+  hosts: your_target_servers
+  become: true
+  remote_user: samir
+
+  vars:
+    github_repo_url: "git@github.com:danbots-dk/inference-dev-server.git"
+    local_clone_path: "/home/samir/sal_github/docker/inference-dev-server"
+    ssh_user: "samir"
+    ssh_private_key: "/home/samir/.ssh/id_ed25519"
+
+  tasks:
+    - name: Ensure git is installed
+      package:
+        name: git
+        state: present
+
+    - name: Update GitHub repository
+      git:
+        repo: "{{ github_repo_url }}"
+        dest: "{{ local_clone_path }}"
+        key_file: "{{ ssh_private_key }}"
+        update: yes
+        accept_hostkey: yes
+
+      environment:
+        GIT_ASKPASS: echo
+      register: git_result
+
+    - name: Fail if git clone/pull failed
+      fail:
+        msg: "Failed to clone/pull the GitHub repository"
+      when: git_result.failed 
+
+    - name: Build docker container and restart
+      command: "/bin/bash -c 'docker container stop inference-dev && ./docker-build.sh && ./docker-setup.sh <<< y'"
+      become: true
+      become_user: "{{ ssh_user }}"
+      when: not git_result.failed  # Run only if git clone/pull is successful
+      register: command_output
+      args:
+        chdir: "/home/samir/sal_github/docker/inference-dev-server/docker"
+    - name: Display command output
+      debug:
+        var: command_output.stdout_lines
+
+

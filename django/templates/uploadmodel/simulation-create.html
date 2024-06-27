@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% block extra_head %}
+{% endblock %}
+{% load i18n static %}
+{% block title %}{% trans "Upload Simulation Model" %}{% endblock %}
+{% block content %}
+    <div class="card-deck">
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header">
+                <h5 class="my-0 font-weight-bold">Please fill up information about upload simulation model</h5>
+            </div>
+            <div class="card-body">
+                {% if form.errors %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        {{ form.errors }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endif %}
+                
+                {% if messages %}
+                    {% for message in messages %}
+                        {% if  message.tags == "error" %}
+                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                {{ message|safe }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message|safe }}
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+
+                <form method="post" enctype="multipart/form-data" id="upload-simulation-model">
+                    {% csrf_token %}
+                    <div class="form-group row">
+                        <label for="{{ form.input_folder.id_for_label }}" class="col-sm-3 col-form-label font-weight-bold">{{ form.input_folder.label }}</label>
+                        <div class="col-sm-9">
+                            {{ form.input_folder }}
+                            {% if form.input_folder.errors %}
+                                <span class="text-danger">{{ form.input_folder.errors }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="{{ form.uploaded_model.id_for_label }}" class="col-sm-3 col-form-label font-weight-bold">
+                            {{ form.uploaded_model.label }}
+                        </label>
+                        <div class="col-sm-9">
+                            {{ form.uploaded_model }}
+                            {% if form.uploaded_model.errors %}
+                                <span class="text-danger">{{ form.uploaded_model.errors }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="{{ form.depth_model.id_for_label }}" class="col-sm-3 col-form-label font-weight-bold">
+                            {{ form.depth_model.label }}
+                        </label>
+                        <div class="col-sm-9">
+                            {{ form.depth_model }}
+                            {% if form.depth_model.errors %}
+                                <span class="text-danger">{{ form.depth_model.errors }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="{{ form.wrap_model.id_for_label }}" class="col-sm-3 col-form-label font-weight-bold">
+                            {{ form.wrap_model.label }}
+                        </label>
+                        <div class="col-sm-9">
+                            {{ form.wrap_model }}
+                            {% if form.wrap_model.errors %}
+                                <span class="text-danger">{{ form.wrap_model.errors }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="form-group row">
+                        <label for="{{ form.lum_model.id_for_label }}" class="col-sm-3 col-form-label font-weight-bold">
+                            {{ form.lum_model.label }}
+                        </label>
+                        <div class="col-sm-9">
+                            {{ form.lum_model }}
+                            {% if form.lum_model.errors %}
+                                <span class="text-danger">{{ form.lum_model.errors }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="{{ form.opa_model.id_for_label }}" class="col-sm-3 col-form-label font-weight-bold">
+                            {{ form.opa_model.label }}
+                        </label>
+                        <div class="col-sm-9">
+                            {{ form.opa_model }}
+                            {% if form.opa_model.errors %}
+                                <span class="text-danger">{{ form.opa_model.errors }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+        
+                    <div class="form-group row">
+                        <label for="{{ form.batch_name.id_for_label }}" class="col-sm-3 col-form-label font-weight-bold">{{ form.batch_name.label }}</label>
+                        <div class="col-sm-9">
+                            {{ form.batch_name }}
+                            {% if form.batch_name.errors %}
+                                <span class="text-danger">{{ form.batch_name.errors }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="{{ form.start.id_for_label }}" class="col-sm-3 col-form-label font-weight-bold">{{ form.start.label }}</label>
+                        <div class="col-sm-9">
+                            {{ form.start }}
+                            {% if form.start.errors %}
+                                <span class="text-danger">{{ form.start.errors }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="{{ form.stop.id_for_label }}" class="col-sm-3 col-form-label font-weight-bold">{{ form.stop.label }}</label>
+                        <div class="col-sm-9">
+                            {{ form.stop }}
+                            {% if form.stop.errors %}
+                                <span class="text-danger">{{ form.stop.errors }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="{{ form.step.id_for_label }}" class="col-sm-3 col-form-label font-weight-bold">{{ form.step.label }}</label>
+                        <div class="col-sm-9">
+                            {{ form.step }}
+                            {% if form.step.errors %}
+                                <span class="text-danger">{{ form.step.errors }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div style="text-align: right;">
+                        <button type="submit" class="btn btn-primary">Execute</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block extra_js %}
+    <script>
+        $(document).ready(function () {
+           console.log('...')
+        });
+    </script>
+{% endblock %}
